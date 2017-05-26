@@ -61,6 +61,7 @@ let g:mapleader = ","
 " Fast saving
 nmap <leader>w :w!<cr>
 
+colo  molokai
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => VIM user interface
@@ -123,7 +124,7 @@ set tm=500
 " Enable syntax highlighting
 syntax enable
 
-colorscheme desert
+colorscheme molokai
 set background=dark
 
 " Set extra options when running in GUI mode
@@ -134,12 +135,153 @@ if has("gui_running")
     set guitablabel=%M\ %t
 endif
 
+set nu
+
 " Set utf8 as standard encoding and en_US as the standard language
 set encoding=utf8
 
 " Use Unix as the standard file type
 set ffs=unix,dos,mac
 
+" Configure vim/gvim presentation
+
+" List characters
+if (&termencoding == "utf-8") || has("gui")
+  set listchars=tab:»·,trail:·
+else
+  set listchars=tab:>.,trail:.
+end
+set list
+
+set nowrap
+
+" Configure gui options
+set guioptions-=m  "remove menu bar
+set guioptions-=T  "remove toolbar
+set guioptions-=r  "remove right-hand scroll bar
+
+if has("gui")
+  colorscheme desert
+else
+  colorscheme industry
+endif
+
+" Configure prompt.
+set laststatus=2
+set statusline=
+set statusline+=%2*%-3.3n%0*\                " buffer number
+set statusline+=%f\                          " file name
+set statusline+=%h%1*%m%r%w%0*               " flags
+set statusline+=\[%{strlen(&ft)?&ft:'none'}, " filetype
+set statusline+=%{&encoding},                " encoding
+set statusline+=%{&fileformat}]              " file format
+set statusline+=%=                           " right align
+set statusline+=%2*0x%-8B\                   " current char
+set statusline+=%-14.(%l,%c%V%)\ %<%P        " offset
+
+" Better scrolling navigation
+set scrolloff=2
+set sidescroll=8
+set sidescrolloff=4
+
+" Configure folding
+set foldenable
+set foldmethod=indent
+set foldlevelstart=99
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => vim plug
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
+call plug#begin('~/.vim/plugged')
+
+" Make sure you use single quotes
+
+" Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
+Plug 'junegunn/vim-easy-align'
+
+" Any valid git URL is allowed
+Plug 'https://github.com/junegunn/vim-github-dashboard.git'
+
+" Multiple Plug commands can be written in a single line using | separators
+Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+
+" On-demand loading
+Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
+
+" Using a non-master branch
+Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
+
+" Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
+Plug 'fatih/vim-go', { 'tag': '*' }
+
+" Plugin options
+Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }
+
+" Plugin outside ~/.vim/plugged with post-update hook
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+
+" Unmanaged plugin (manually installed and updated)
+Plug '~/my-prototype-plugin'
+
+" Tagbar for tags
+Plug 'https://github.com/majutsushi/tagbar'
+
+Plug 'scrooloose/syntastic'
+
+Plug 'altercation/vim-colors-solarized'
+
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'https://github.com/Raimondi/delimitMate'
+Plug 'git://github.com/scrooloose/nerdcommenter.git'
+Plug 'git://github.com/vim-scripts/supertab.git'
+Plug 'git://github.com/tpope/vim-fugitive.git'
+Plug 'https://github.com/Shougo/neocomplete.vim'
+
+
+" Initialize plugin system
+call plug#end()
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => NerdTree
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" auto start nerdtree when vim is started with no files
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+" remap to ctrl+n
+map <C-n> :NERDTreeToggle<CR>
+
+"auto close nerdtree if it is the last thing open
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => TagBar
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap <F8> :TagbarToggle<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Misc plugins 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Recomended
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+let g:SuperTabDefaultCompletionType = "context"
+let g:tagbar_usearrows = 1
+nnoremap <leader>l :TagbarToggle<CR>
+let g:neocomplete#enable_at_startup = 1
+let g:loaded_syntastic_java_javac_checker = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Files, backups and undo
@@ -170,6 +312,7 @@ set tw=500
 set ai "Auto indent
 set si "Smart indent
 set wrap "Wrap lines
+
 
 
 """"""""""""""""""""""""""""""
@@ -245,6 +388,7 @@ set laststatus=2
 " Format the status line
 set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l
 
+let g:airline#extensions#tabline#enabled = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Editing mappings
@@ -393,3 +537,5 @@ function! <SID>BufcloseCloseIt()
      execute("bdelete! ".l:currentBufNum)
    endif
 endfunction
+
+colo molokai
