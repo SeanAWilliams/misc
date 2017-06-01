@@ -1,10 +1,3 @@
-# README!!
+#README
 
-Simple vim config that I found online then modified a little
-afer doenloading just do a
-
-```vim
-:PluginInstall
-```
-
-and you are good to go
+just some setting for vim bash and intellij that i have either stolen or made or both.
